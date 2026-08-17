@@ -1,3 +1,21 @@
 spring:
   datasource:
     url: jdbc:postgresql://algashop-postgres:5432/billing
+
+logging:
+  level:
+    # Define o nível global. Use INFO ou DEBUG para ver mais coisas.
+    root: INFO
+    # Você pode definir níveis específicos para seus pacotes
+    com.eskcti.algashop.billingscheduler: DEBUG
+    org.springframework: INFO
+    org.hibernate: WARN
+
+  # Configura o padrão (formato) da mensagem no console
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+  # ATENÇÃO: Se você tiver a configuração de 'file' abaixo, o log vai para um arquivo
+  # DENTRO do container e NÃO aparece no 'docker logs'. Deixe comentado ou remova.
+  # file:
+  #   name: /var/log/minha-app.log

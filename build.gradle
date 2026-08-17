@@ -1,7 +1,7 @@
 plugins {
     id 'idea'
 	id 'java'
-	id 'org.springframework.boot' version '3.5.5'
+	id 'org.springframework.boot' version '3.5.6'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'jacoco'
 }
@@ -12,7 +12,7 @@ description = 'Billing Scheduler project'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
@@ -20,7 +20,7 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    mockitoAgent {transitive = false}
+    mockitoAgent
 }
 
 repositories {
@@ -32,46 +32,17 @@ ext {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-    implementation 'org.springframework.boot:spring-boot-starter-restclient'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    implementation 'commons-validator:commons-validator:1.10.1'
-    implementation 'com.fasterxml.uuid:java-uuid-generator:5.2.0'
-    implementation 'io.hypersistence:hypersistence-tsid:2.1.4'
-
-    runtimeOnly 'org.postgresql:postgresql'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-restclient-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
-    testImplementation 'org.springframework.cloud:spring-cloud-starter-contract-verifier'
-    constraints {
-        testImplementation('io.rest-assured:rest-assured:6.0.0') {
-            version {
-                strictly '6.0.0'
-            }
-        }
-        testImplementation('io.rest-assured:spring-mock-mvc:6.0.0') {
-            version {
-                strictly '6.0.0'
-            }
-        }
-    }
-
-    testImplementation 'org.assertj:assertj-core:3.27.6'
-
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-
-    mockitoAgent('org.mockito:mockito-core')
+  implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	runtimeOnly 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	mockitoAgent('org.mockito:mockito-core:5.14.2') {transitive = false}
 }
 
 dependencyManagement {
@@ -118,7 +89,7 @@ tasks.register('integrationTest', Test) {
 }
 
 bootJar {
-    archiveFileName = 'billingscheduler.jar'
+    archiveFileName = 'billing-scheduler.jar'
 }
 
 tasks.register('dockerBuild', Exec) {
@@ -127,5 +98,5 @@ tasks.register('dockerBuild', Exec) {
     dependsOn('bootJar')
     workingDir project.rootDir
     commandLine 'docker', 'buildx', 'build', '--platform', 'linux/arm64/v8,linux/amd64',
-            '--tag', 'algashop/billingscheduler:dev', '.'
+            '--tag', 'algashop/billing-scheduler:dev', '.'
 }
