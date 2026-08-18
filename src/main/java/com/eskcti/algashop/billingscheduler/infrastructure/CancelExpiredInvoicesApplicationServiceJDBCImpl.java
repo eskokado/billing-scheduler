@@ -52,7 +52,12 @@ public class CancelExpiredInvoicesApplicationServiceJDBCImpl implements CancelEx
     transactionTemplate.execute(status -> {
       List<UUID> invoiceIds = fetchExpiredInvoices();
       log.info("Task - Total invoices fetched: {}", invoiceIds.size());
-      int totalCanceledInvoices = cancelInvoices(invoiceIds);
+      if (invoiceIds.isEmpty()) {
+        log.info("Task - No expired invoices found for cancellation");
+        return true;
+      }
+      // int totalCanceledInvoices = cancelInvoices(invoiceIds);
+      int totalCanceledInvoices = cancelInvoicesBatch(invoiceIds);
       log.info("Task - Total invoices canceled: {}", totalCanceledInvoices);
       return true;
     });
@@ -79,5 +84,23 @@ public class CancelExpiredInvoicesApplicationServiceJDBCImpl implements CancelEx
       }
     }
     return updatedInvoices;
+  }
+
+  private int cancelInvoicesBatch(List<UUID> invoiceIds) {
+    try {
+      jdbcOperations.batchUpdate(UPDATE_INVOICE_STATUS_SQL,
+          invoiceIds,
+          invoiceIds.size(),
+          (ps, id) -> {
+            ps.setString(1, CANCEL_STATUS);
+            ps.setString(2, CANCEL_REASON);
+            ps.setObject(3, id);
+          });
+      log.info("Task - Invoices canceled IDs {}", invoiceIds);
+      return invoiceIds.size();
+    } catch (DataAccessException e) {
+      log.error("Task - Failed to cancel invoices {}", invoiceIds, e);
+      return 0;
+    }
   }
 }
