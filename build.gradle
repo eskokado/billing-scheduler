@@ -34,10 +34,11 @@ ext {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web' // para acionar o scheduler
-	// implementation ('org.springframework.boot:spring-boot-starter-web') { // acionar o Short-lived task
-	// 	exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
-	// }
+	// implementation 'org.springframework.boot:spring-boot-starter-web' // para acionar o scheduler
+	implementation ('org.springframework.boot:spring-boot-starter-web') { // acionar o Short-lived task
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
+	}
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	runtimeOnly 'org.postgresql:postgresql'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

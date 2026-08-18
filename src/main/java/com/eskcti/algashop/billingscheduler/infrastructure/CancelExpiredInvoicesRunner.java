@@ -7,7 +7,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-// @Component
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class CancelExpiredInvoicesRunner implements ApplicationRunner {
@@ -17,7 +17,8 @@ public class CancelExpiredInvoicesRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("Task started - Cancelling expired invoices.");
-        applicationService.cancelExpiredInvoices();
-        log.info("Task ended - Expired invoices.");
+        // applicationService.cancelExpiredInvoices();
+        applicationService.cancelExpiredInvoicesPayments();
+        log.info("Task ended - Expired invoices payments canceled.");
     }
 }
