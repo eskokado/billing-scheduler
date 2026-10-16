@@ -1,0 +1,11 @@
+spring:
+  sql:
+    init:
+      mode: always
+
+algashop:
+  integrations:
+    payment:
+      fastpay:
+        hostname: http://localhost:9995
+        private-token: test-private-token

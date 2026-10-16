@@ -43,6 +43,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
@@ -75,6 +78,9 @@ tasks.register('integrationTest', Test) {
     group = 'verification'
     jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
 
+    // docker-java 3.4.2 (Testcontainers 1.21.x) negocia API 1.32; Docker 29+ exige >= 1.40
+    systemProperty 'api.version', '1.40'
+
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
 
@@ -95,6 +101,45 @@ tasks.register('integrationTest', Test) {
 bootJar {
     archiveFileName = 'billing-scheduler.jar'
 }
+
+def jacocoCoverageExcludes = [
+    '**/BillingSchedulerApplication.class',
+    '**/FastpayFastpayPaymentAPIClientConfig.class',
+    '**/AlgaShopPaymentProperties*.class'
+]
+
+jacocoTestReport {
+    dependsOn test, integrationTest
+    executionData(test, integrationTest)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: jacocoCoverageExcludes)
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn test, integrationTest
+    executionData(test, integrationTest)
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90
+            }
+        }
+    }
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: jacocoCoverageExcludes)
+        }))
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
 
 tasks.register('dockerBuild', Exec) {
     description = 'Builds a multi-platform Docker image using Buildx'
