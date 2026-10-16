@@ -70,7 +70,6 @@ public class CancelExpiredInvoicesApplicationServiceJDBCImpl implements CancelEx
         log.info("Task - No expired invoices found for cancellation");
         return true;
       }
-      // int totalCanceledInvoices = cancelInvoices(invoiceIds);
       int totalCanceledInvoices = cancelInvoicesBatch(invoiceIds);
       log.info("Task - Total invoices canceled: {}", totalCanceledInvoices);
       return true;
@@ -110,20 +109,6 @@ public class CancelExpiredInvoicesApplicationServiceJDBCImpl implements CancelEx
         resultSet.getObject("id", UUID.class),
         resultSet.getString("gateway_code"));
     return jdbcOperations.query(SELECT_EXPIRED_INVOICES_PAYMENTS_SQL, preparedStatementSetter, mapper);
-  }
-
-  private int cancelInvoices(List<UUID> invoiceIds) {
-    int updatedInvoices = 0;
-    for (UUID invoiceId : invoiceIds) {
-      try {
-        jdbcOperations.update(UPDATE_INVOICE_STATUS_SQL, CANCEL_STATUS, CANCEL_REASON, invoiceId);
-        updatedInvoices++;
-        log.info("Task - Invoice canceled ID {}", invoiceId);
-      } catch (DataAccessException e) {
-        log.error("Task - Failed to cancel invoice with ID {}", invoiceId, e);
-      }
-    }
-    return updatedInvoices;
   }
 
   private int cancelInvoicesBatch(List<UUID> invoiceIds) {
