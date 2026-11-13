@@ -1,7 +1,7 @@
 plugins {
     id 'idea'
 	id 'java'
-	id 'org.springframework.boot' version '3.5.6'
+	id 'org.springframework.boot' version '4.0.1'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'jacoco'
 }
@@ -12,7 +12,7 @@ description = 'Billing Scheduler project'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -28,7 +28,7 @@ repositories {
 }
 
 ext {
-    set('springCloudVersion', "2025.1.0")
+    set('springCloudVersion', "2025.1.2")
     set('springCloudAwsVersion', "4.0.0")
 }
 
@@ -46,6 +46,7 @@ dependencies {
 	implementation ('org.springframework.boot:spring-boot-starter-web') { // acionar o Short-lived task
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat'
 	}
+	implementation 'org.springframework.boot:spring-boot-starter-restclient'
 
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-secrets-manager'
